@@ -19,7 +19,7 @@ pipeline {
     stages {
         stage('Checkout From Git') {
             steps {
-                git branch: 'prod', url: 'https://github.com/bkrrajmali/newspring-pet-clininc.git'
+                git branch: 'prod', url: 'https://github.com/bkrrajmali/enahanced-petclinc-springboot.git'
             }
         }
 
@@ -43,8 +43,7 @@ pipeline {
                 sh 'trivy fs --format table --output trivy-report.txt --severity HIGH,CRITICAL .'
             }
         }
-
-        stage('Sonar Analysis') {
+         stage('Sonar Analysis') {
             environment {
                 SCANNER_HOME = tool 'Sonar-scanner'
             }
@@ -61,97 +60,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true, credentialsId: 'sonar'
-                }
-            }
-        }
-
-        stage('Maven Package') {
-            steps {
-                echo 'Maven package Started'
-                sh 'mvn package'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Build image from Dockerfile in the root directory
-                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
-        }
-
-        stage('Azure Login to ACR') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'azure-acr-sp', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
-                    script {
-                        sh '''
-                        az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
-                        az acr login --name $ACR_NAME
-                        '''
-                    }
-                }
-            }
-        }
-
-        stage('Tag and Push Image to ACR') {
-            steps {
-                script {
-                    sh """
-                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${FULL_IMAGE_NAME}
-                    docker push ${FULL_IMAGE_NAME}
-                    """
-                }
-            }
-        }
-
-        stage('Azure Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'azure-acr-sp', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
-                    sh '''
-                    az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
-                    az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy to AKS (Create or Rolling Update)') {
-            steps {
-                script {
-                    echo "🚀 Deploying to AKS: Check if deployment exists"
-                    sh """
-                    kubectl apply -f k8s/springboot-pvc.yaml -n $K8S_NAMESPACE
-
-                    if kubectl get deployment ${K8S_DEPLOYMENT} -n ${K8S_NAMESPACE} > /dev/null 2>&1; then
-                      echo "🔄 Deployment exists. Performing rolling update..."
-                      kubectl set image deployment/${K8S_DEPLOYMENT} ${IMAGE_NAME}=${FULL_IMAGE_NAME} -n ${K8S_NAMESPACE}
-                      kubectl rollout status deployment/${K8S_DEPLOYMENT} -n ${K8S_NAMESPACE}
-                    else
-                      echo "🆕 Deployment does not exist. Creating deployment..."
-                      kubectl apply -f k8s/deployment-with-tag.yaml -n ${K8S_NAMESPACE}
-                      kubectl rollout status deployment/${K8S_DEPLOYMENT} -n ${K8S_NAMESPACE}
-                    fi
-                    """
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                echo "✅ Deployment successful: ${FULL_IMAGE_NAME}"
-            }
-        }
-        failure {
-            echo "❌ Deployment failed. Please check the logs."
-        }
     }
 }
-
