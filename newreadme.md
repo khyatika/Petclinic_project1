@@ -23,3 +23,13 @@ wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-k
 echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
 sudo apt update
 sudo apt install trivy -y
+
+### Docker Install
+#Docker
+curl https://get.docker.com | bash
+sudo usermod -aG docker $USER
+sudo usermod -aG docker jenkins
+newgrp docker
+sudo systemctl stop docker 
+sudo systemctl enable --now docker 
+sudo systemctl start docker
