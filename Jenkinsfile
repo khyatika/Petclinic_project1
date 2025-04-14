@@ -73,5 +73,11 @@ pipeline {
                 sh 'mvn package'
             }
         }
+        stage('Docker Build') {
+            steps {
+                echo "Docker Build Started"
+                docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+            }
+        }
     }
 }
