@@ -123,11 +123,12 @@ pipeline {
         script {
             echo " Kubernetes Deployment Stage Started"
 
-            // Check if deployment exists
-            def deploymentExists = sh(
+            def output = sh(
                 script: "kubectl get deployment springboot-app -n $K8S_NAMESPACE --ignore-not-found",
-                returnStatus: true
-            ) == 0
+                returnStdout: true
+            ).trim()
+
+            def deploymentExists = output != ""
 
             if (deploymentExists) {
                 echo " Deployment exists. Performing rolling update with new image: ${BUILD_NUMBER}"
@@ -137,7 +138,7 @@ pipeline {
                   -n $K8S_NAMESPACE
                 """
             } else {
-                echo "🚀 Deployment not found. Creating new deployment from template"
+                echo " Deployment not found. Creating new deployment from template"
                 sh """
                 sed "s/__IMAGE_TAG__/${BUILD_NUMBER}/" k8s/springboot-deployment.yaml > k8s/tmp-deployment.yaml
                 kubectl apply -f k8s/tmp-deployment.yaml -n $K8S_NAMESPACE
@@ -146,7 +147,6 @@ pipeline {
         }
     }
 }
-
 
  }
 }
