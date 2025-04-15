@@ -37,3 +37,20 @@ sudo systemctl start docker
 ### Install az cli
 
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+### Deploy AKS
+RG=Jenkins
+NAME=springboot
+
+az aks create --resource-group $RG --name $NAME \
+--kubernetes-version 1.31.1 --nodepool-name systempool --node-count 2 --enable-node-public-ip \
+--enable-managed-identity --enable-cluster-autoscaler --min-count 2 --max-count 3 \
+--generate-ssh-keys
+
+
+### Create secret in Kubernetes for connecting to ACR
+kubectl create secret docker-registry acr-auth \
+  --docker-server=jenkinsazure.azurecr.io \
+  --docker-username=jenkinsazure \
+  --docker-password=6RJ2NfOEz1E+8F6WgfdCDGL5rguYk1kOQkMuvK1fD4+ACRBKHglZ \
+  --docker-email=bkrraj@gmail.com

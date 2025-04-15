@@ -105,5 +105,29 @@ pipeline {
                 }
             }
         }
+    stage('Azure Login to ACR') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'azure-acr-sp',usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
+                script {
+                    echo "Azure Login Started"
+                    sh '''
+                    az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
+                    az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing    
+                    az aks update --name $AKS_CLUSTER --resource-group $RESOURCE_GROUP --attach-acr $ACR_NAME   
+                    '''
+                }
+            }
+          }
+       }
+      stage('Kubernetes Deployment') {
+            steps {
+                script {
+                    echo "Kubernetes Deployment Started"
+                    sh '''
+                    kubectl apply -f k8s/sprinboot-deployment.yaml -n $K8S_NAMESPACE
+                    '''
+                }
+            }
+        } 
     }
 }
