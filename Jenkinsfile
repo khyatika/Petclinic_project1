@@ -119,14 +119,15 @@ pipeline {
           }
        }
       stage('Kubernetes Deployment') {
-            steps {
-                script {
-                    echo "Kubernetes Deployment Started"
-                    sh '''
-                    kubectl apply -f k8s/sprinboot-deployment.yaml -n $K8S_NAMESPACE
-                    '''
-                }
-            }
-        } 
+    steps {
+        script {
+            echo "Kubernetes Deployment Started"
+            sh '''
+            sed "s/__IMAGE_TAG__/$BUILD_NUMBER/" k8s/sprinboot-deployment.yaml > k8s/tmp-deployment.yaml
+            kubectl apply -f k8s/tmp-deployment.yaml -n $K8S_NAMESPACE
+            '''
+        }
     }
+  } 
+ }
 }
