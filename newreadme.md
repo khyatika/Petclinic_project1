@@ -33,3 +33,7 @@ newgrp docker
 sudo systemctl stop docker 
 sudo systemctl enable --now docker 
 sudo systemctl start docker
+
+### Install az cli
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
