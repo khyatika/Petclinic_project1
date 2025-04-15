@@ -105,7 +105,7 @@ pipeline {
                 }
             }
         }
-    stage('Azure Login to ACR') {
+    stage('Azure Login to Kubernetes') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'azure-acr-sp',usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
                 script {
