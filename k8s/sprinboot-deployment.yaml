@@ -16,11 +16,11 @@ spec:
     spec:
       containers:
         - name: springboot-app
-          image: jenkinsazure.azurecr.io/springbootapp:22
+          image: jenkinsazure.azurecr.io/springbootapp:23
           ports:
             - containerPort: 8080
-      imagesPullSecrets:
-        - name: acr-auth
+    imagesPullSecrets:
+    - name: acr-auth
 
 ---
 apiVersion: v1
