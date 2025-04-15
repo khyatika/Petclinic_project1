@@ -140,7 +140,7 @@ pipeline {
             } else {
                 echo " Deployment not found. Creating new deployment from template"
                 sh """
-                sed "s/__IMAGE_TAG__/${BUILD_NUMBER}/" k8s/springboot-deployment.yaml > k8s/tmp-deployment.yaml
+                sed "s/__IMAGE_TAG__/${BUILD_NUMBER}/" k8s/sprinboot-deployment.yaml > k8s/tmp-deployment.yaml
                 kubectl apply -f k8s/tmp-deployment.yaml -n $K8S_NAMESPACE
                 """
             }
