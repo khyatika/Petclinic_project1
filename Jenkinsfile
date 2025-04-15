@@ -118,16 +118,30 @@ pipeline {
             }
           }
        }
-      stage('Kubernetes Deployment') {
+   stage('Kubernetes Deployment') {
     steps {
         script {
             echo "Kubernetes Deployment Started"
-            sh '''
-            sed "s/__IMAGE_TAG__/$BUILD_NUMBER/" k8s/sprinboot-deployment.yaml > k8s/tmp-deployment.yaml
-            kubectl apply -f k8s/tmp-deployment.yaml -n $K8S_NAMESPACE
-            '''
+
+            def deploymentExists = sh(script: "kubectl get deployment springboot-app -n $K8S_NAMESPACE --ignore-not-found", returnStatus: true) == 0
+
+            if (deploymentExists) {
+                echo "Deployment exists. Updating image..."
+                sh """
+                kubectl set image deployment/springboot-app \
+                  springboot-app=jenkinsazure.azurecr.io/springbootapp:${BUILD_NUMBER} \
+                  -n $K8S_NAMESPACE --record
+                """
+            } else {
+                echo "Deployment does not exist. Applying YAML..."
+                sh """
+                sed "s/__IMAGE_TAG__/${BUILD_NUMBER}/" k8s/sprinboot-deployment.yaml > k8s/tmp-deployment.yaml
+                kubectl apply -f k8s/tmp-deployment.yaml -n $K8S_NAMESPACE
+                """
+            }
         }
     }
-  } 
+}
+
  }
 }
