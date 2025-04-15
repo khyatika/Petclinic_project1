@@ -49,8 +49,3 @@ az aks create --resource-group $RG --name $NAME \
 
 
 ### Create secret in Kubernetes for connecting to ACR
-kubectl create secret docker-registry acr-auth \
-  --docker-server=jenkinsazure.azurecr.io \
-  --docker-username=jenkinsazure \
-  --docker-password=6RJ2NfOEz1E+8F6WgfdCDGL5rguYk1kOQkMuvK1fD4+ACRBKHglZ \
-  --docker-email=bkrraj@gmail.com
