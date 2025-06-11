@@ -1,14 +1,18 @@
 pipeline {
     agent any
+    tools {
+        maven 'maven'
+    }
     stages {
         stage('Checkout From Git') {
             steps {
                 git branch: 'prod', url: 'https://github.com/bkrrajmali/enahanced-petclinc-springboot.git'
             }
         }
-        stage('Test') {
+        stage('Maven Compile') {
             steps {
-                echo "Test1"
+                echo "This is Maven Compile Stage"
+                sh " mvn compile"
             }
         }
         stage('Deploy') {
