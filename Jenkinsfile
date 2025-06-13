@@ -11,6 +11,8 @@ pipeline {
         ACR_NAME      =  "dockerregnodejs"
         ACR_LOGIN_SERVER = "${ACR_NAME}.azurecr.io"
         FULL_IMAGE_NAME = "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}"
+        RESOURCE_GROUP  = "demo-rg"
+        CLUSTER_NAME = "demo-eks"
     }
     stages {
         stage('Checkout From Git') {
@@ -89,7 +91,7 @@ pipeline {
                 }
         }
     }
-    stage('Docker Push') {
+        stage('Docker Push') {
             steps {
                 script {
                      echo 'Docker Push Started'
@@ -97,6 +99,29 @@ pipeline {
                             docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${FULL_IMAGE_NAME}
                             docker push ${FULL_IMAGE_NAME}
                      '''
+                }
+            }
+        }
+
+        stage('Jenkins Login to Kubernetes') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'azurespn', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
+                    script {
+                        echo "Jenkins Login to Azure and Kubernetes"
+                        az login  --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
+                        az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
+                    }
+                 }
+            }
+        }
+
+        stage('Deploy to kubernetes') {
+            steps {
+                script {
+                    echo 'Deploy to Kubernetes'
+                    sh 'kubectl apply -f k8s/sprinboot-deployment.yaml'
+                    echo 'Deployed to Kubernetes'
+
                 }
             }
         }
