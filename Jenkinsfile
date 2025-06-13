@@ -122,8 +122,7 @@ pipeline {
                 script {
                     echo 'Deploy to Kubernetes'
                     sh '''
-                    'kubectl apply -f k8s/sprinboot-deployment.yaml'
-                    
+                    kubectl apply -f k8s/sprinboot-deployment.yaml         
                     echo 'Deployed to Kubernetes'
                     '''
 
