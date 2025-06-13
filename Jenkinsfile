@@ -107,9 +107,11 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'azurespn', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
                     script {
+                        sh '''
                         echo "Jenkins Login to Azure and Kubernetes"
-                        az login  --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
+                        az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
                         az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
+                        '''
                     }
                  }
             }
@@ -119,8 +121,11 @@ pipeline {
             steps {
                 script {
                     echo 'Deploy to Kubernetes'
-                    sh 'kubectl apply -f k8s/sprinboot-deployment.yaml'
+                    sh '''
+                    'kubectl apply -f k8s/sprinboot-deployment.yaml'
+                    
                     echo 'Deployed to Kubernetes'
+                    '''
 
                 }
             }
