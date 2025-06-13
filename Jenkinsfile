@@ -9,6 +9,8 @@ pipeline {
         IMAGE_TAG     = "latest"
         TENANT_ID     = "ec78375d-0db0-42cf-82a6-2e6403e95936"
         ACR_NAME      =  "dockerregnodejs"
+        ACR_LOGIN_SERVER = "${ACR_NAME}.azurecr.io"
+        FULL_IMAGE_NAME = "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
     stages {
         stage('Checkout From Git') {
@@ -79,7 +81,7 @@ pipeline {
                     script {
                         echo 'Azure Login '
                         sh '''
-                        az login  --service-pricipal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
+                        az login  --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $TENANT_ID
                         az acr login --name $ACR_NAME
 
                         '''
@@ -87,5 +89,16 @@ pipeline {
                 }
         }
     }
+    stage('Docker Push') {
+            steps {
+                script {
+                     echo 'Docker Push Started'
+                        sh '''
+                            docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${FULL_IMAGE_NAME}
+                            docker push ${FULL_IMAGE_NAME}
+                     '''
+                }
+            }
+        }
     }
 }
