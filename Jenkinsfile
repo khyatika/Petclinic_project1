@@ -122,7 +122,6 @@ pipeline {
                 script {
                     echo 'Deploy to Kubernetes'
                     sh '''
-                    kubectl delete deploy springboot-app
                     kubectl apply -f k8s/sprinboot-deployment.yaml         
                     echo 'Deployed to Kubernetes'
                     '''
