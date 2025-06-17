@@ -7,11 +7,11 @@ pipeline {
     environment {
         IMAGE_NAME    =  "springboot"
         IMAGE_TAG     = "latest"
-        TENANT_ID     = "ec78375d-0db0-42cf-82a6-2e6403e95936"
-        ACR_NAME      =  "dockerregnodejs"
+        TENANT_ID     = "f46e6d7b-1a04-483f-85ed-4069b0e44659"
+        ACR_NAME      =  "dockerregnodejsw"
         ACR_LOGIN_SERVER = "${ACR_NAME}.azurecr.io"
         FULL_IMAGE_NAME = "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}"
-        RESOURCE_GROUP  = "demo-rg"
+        RESOURCE_GROUP  = "DemoAKS"
         CLUSTER_NAME = "demo-eks"
     }
     stages {
@@ -46,9 +46,9 @@ pipeline {
                 withSonarQubeEnv('sonarserver') {
                     sh '''
                     $SCANNER_HOME/bin/sonar-scanner \
-                    -Dsonar.organization=bkrrajmali \
-                    -Dsonar.projectName=SpringBootPet \
-                    -Dsonar.projectKey=bkrrajmali_springbootpet \
+                    -Dsonar.organization=khyatika \
+                    -Dsonar.projectName=Penclinic \
+                    -Dsonar.projectKey=khyatika_penclinic \
                     -Dsonar.java.binaries=. \
                     -Dsonar.exclusions=**/trivy-report.txt
                     '''
