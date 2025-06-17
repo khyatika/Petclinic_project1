@@ -17,7 +17,7 @@ pipeline {
     stages {
         stage('Checkout From Git') {
             steps {
-                git branch: 'prod', url: 'https://github.com/bkrrajmali/enahanced-petclinc-springboot.git'
+                git branch: 'main', url: 'https://github.com/khyatika/Petclinic_project1.git'
             }
         }
         stage('Maven Compile') {
