@@ -79,7 +79,7 @@ pipeline {
         }
         stage('Azure Login to ACR') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'azurespn', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'azure_login', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
                     script {
                         echo 'Azure Login '
                         sh '''
@@ -105,7 +105,7 @@ pipeline {
 
         stage('Jenkins Login to Kubernetes') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'azurespn', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'azure_login', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
                     script {
                         sh '''
                         echo "Jenkins Login to Azure and Kubernetes"
